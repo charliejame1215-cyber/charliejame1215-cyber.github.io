@@ -1,68 +1,485 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>The Monk Diamond</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Monk Diamond</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --emerald: #1a5c3a;
+      --emerald-light: #2d8a58;
+      --emerald-pale: #a8d5b5;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --cream: #f5f0e8;
+      --dark: #0d1f15;
+      --text: #1c1c1c;
+    }
+
+    body {
+      background-color: var(--dark);
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── HERO BANNER ── */
+    .hero {
+      position: relative;
+      background: linear-gradient(160deg, #0b2619 0%, #1a5c3a 50%, #0d2f1e 100%);
+      padding: 80px 40px 60px;
+      text-align: center;
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* geometric diamond behind title */
+    .hero-diamond {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 320px; height: 320px;
+      border: 1px solid rgba(201,168,76,0.15);
+      opacity: 0.5;
+      animation: spin 40s linear infinite;
+    }
+    .hero-diamond::before {
+      content: '';
+      position: absolute;
+      inset: 20px;
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+    @keyframes spin { to { transform: translate(-50%, -50%) rotate(405deg); } }
+
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+      position: relative;
+      animation: fadeDown 1s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--cream);
+      position: relative;
+      animation: fadeDown 1s 0.15s ease both;
+    }
+
+    .hero-title span {
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .hero-sub {
+      margin-top: 20px;
+      font-size: 1.05rem;
+      color: var(--emerald-pale);
+      letter-spacing: 0.05em;
+      position: relative;
+      animation: fadeDown 1s 0.3s ease both;
+    }
+
+    /* ── BREAKING NEWS BANNER ── */
+    .breaking {
+      background: var(--gold);
+      color: var(--dark);
+      text-align: center;
+      padding: 10px 20px;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+
+    .breaking::before {
+      content: '◆ BREAKING ◆ ';
+      opacity: 0.6;
+    }
+    .breaking::after {
+      content: ' ◆';
+      opacity: 0.6;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 30px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── DIAMOND IMAGE CARD ── */
+    .diamond-image-card {
+      float: right;
+      margin: 0 0 30px 40px;
+      position: relative;
+      animation: fadeUp 1s 0.5s ease both;
+    }
+
+    .diamond-image-card img {
+      display: block;
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border: 1px solid rgba(201,168,76,0.4);
+      filter: drop-shadow(0 0 20px rgba(45,138,88,0.4));
+    }
+
+    .diamond-image-card .caption {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    /* diamond frame corners */
+    .diamond-image-card::before,
+    .diamond-image-card::after {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+    .diamond-image-card::before { top: -4px; left: -4px; border-width: 2px 0 0 2px; }
+    .diamond-image-card::after  { bottom: 24px; right: -4px; border-width: 0 2px 2px 0; }
+
+    /* ── STATS ROW ── */
+    .stats {
+      display: flex;
+      gap: 1px;
+      margin-bottom: 50px;
+      background: rgba(201,168,76,0.2);
+      border: 1px solid rgba(201,168,76,0.2);
+      animation: fadeUp 1s 0.4s ease both;
+    }
+
+    .stat {
+      flex: 1;
+      padding: 22px 20px;
+      background: rgba(13,31,21,0.7);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--emerald-pale);
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(201,168,76,0.4), transparent);
+    }
+
+    /* ── PROSE ── */
+    .prose {
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: rgba(245,240,232,0.88);
+      margin-bottom: 40px;
+      animation: fadeUp 1s 0.6s ease both;
+    }
+
+    .prose .dropcap::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 4.2rem;
+      font-weight: 900;
+      color: var(--emerald-light);
+      float: left;
+      line-height: 0.75;
+      margin: 6px 12px 0 0;
+    }
+
+    /* ── DISCOVERY CALLOUT ── */
+    .callout {
+      background: linear-gradient(135deg, rgba(26,92,58,0.4), rgba(13,31,21,0.6));
+      border-left: 3px solid var(--emerald-light);
+      padding: 30px 35px;
+      margin: 40px 0;
+      position: relative;
+      animation: fadeUp 1s 0.7s ease both;
+    }
+
+    .callout::before {
+      content: '◆';
+      position: absolute;
+      top: -10px; left: 20px;
+      background: var(--dark);
+      padding: 0 8px;
+      color: var(--emerald-light);
+      font-size: 0.8rem;
+    }
+
+    .callout p {
+      font-size: 1.1rem;
+      line-height: 1.75;
+      color: var(--emerald-pale);
+      font-style: italic;
+    }
+
+    /* ── TIMELINE ── */
+    .timeline {
+      margin: 50px 0;
+      animation: fadeUp 1s 0.8s ease both;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 43px;
+      top: 32px;
+      bottom: -28px;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(201,168,76,0.3), transparent);
+    }
+
+    .timeline-item:last-child::before { display: none; }
+
+    .timeline-year {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--gold);
+      min-width: 56px;
+      padding-top: 3px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .timeline-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 7px;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(201,168,76,0.5);
+    }
+
+    .timeline-text {
+      font-size: 0.98rem;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.8);
+      padding-top: 0;
+    }
+
+    /* ── FOOTER NAV ── */
+    .page-footer {
+      border-top: 1px solid rgba(201,168,76,0.2);
+      padding-top: 40px;
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      animation: fadeUp 1s 1s ease both;
+    }
+
+    .page-footer a {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(201,168,76,0.3);
+      padding-bottom: 2px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .page-footer a:hover {
+      color: var(--gold-light);
+      border-color: var(--gold);
+    }
+
+    .page-footer .site-credit {
+      font-size: 0.7rem;
+      color: rgba(168,213,181,0.5);
+      letter-spacing: 0.12em;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CLEARFIX ── */
+    main::after { content: ''; display: table; clear: both; }
+  </style>
 </head>
 <body>
-<a href="https://therubbersandgiants.github.io">the rubbers</a>
-<style>
-<div style="background-color: black;">
-<div style="color: white;">
-text-align: center
-font-size: 18pt;
-width: 100%;
-height: 25%;
-}
-</style>
-<a href="file:///D:/MORE%20on%20the%20diamond.html">more on thr diamond"</a>
-<p>The Monk Diamond is a rare jewel.<br/>The Monk diamond is over 1 billion years old and is worth over 10 million! It is green in colour and is one of the most expensive and rare diamonds in
-the world! It was found in 1880 and was bought by a Russian nobleman for his wife in 1889.<br/> During the Russian Revolution was stolen
-from the nobleman's palace in St Petersburg.<br/> For 30 years the diamond's whereabouts where unknown until in 1947 it was discovered
-in a police raid and was taken from a gang of petty criminals in Moscow.<br/> It was then given back to the nobleman's son but he sold it
-for an unimaginable amount of money thinking it was bad luck.<br/> The new owners of the Monk Diamond were the house of Volkov,
-which were jewl salesmen.<br/> It was on display there until three years ago it was stolen on a cunning raid by the Bond Brothers.</p>
-</div>
-<div style="color: green;">
-<p>it was found in a remote cave in Australia</p>
- <p>The team was delighted with their discovery.</p>
-</div>
- <img src="diamond (2).jpg" style="height: 150px;"/>
-</div>
-<title>The Monk Diamond</title>
- <style>
-  .header {
-    background-color: darkgreen;
-    padding: 25px;
-    text-align: center;
-    font-size: 18pt;
-    width: 100%;
-    height: 25%;
-  }
-  .title {
-    font-size: 14pt;
-    text-align: center;
-    color: green;
-  }
-  .body {
-    margin: 20px;
-  } 
- </style>
-</head>
-<body>
- <div class="header">
-  The Monk Diamond<br/>
-  An incredible discovery
- </div>
- <br/>
- <div  class="title">
-  Stolen diamond found on expedition in Siberia!
- </div>
- <br/>
- <div class="body">
-   Professor Bairstone and Dr Day were looking for fossils in Siberia.<br/>
-   They found the stolen diamond hidden inside a remote cave.
- </div>
-</body>
-</html>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-diamond"></div>
+    <p class="hero-eyebrow">Special Report · Gemology &amp; History</p>
+    <h1 class="hero-title">The Monk <span>Diamond</span></h1>
+    <p class="hero-sub">One of the rarest green diamonds in existence — and one of the most storied</p>
+  </header>
+
+  <!-- BREAKING NEWS -->
+  <div class="breaking">Stolen diamond found on expedition in Siberia</div>
+
+  <main>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value">1B+</span>
+        <span class="stat-label">Years Old</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">$10M+</span>
+        <span class="stat-label">Estimated Value</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">Green</span>
+        <span class="stat-label">Colour</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">1880</span>
+        <span class="stat-label">Year Discovered</span>
+      </div>
+    </div>
+
+    <!-- DIAMOND IMAGE -->
+    <div class="diamond-image-card">
+      <img src="diamond (2).jpg" alt="The Monk Diamond" onerror="this.style.display='none'"/>
+      <p class="caption">The Monk Diamond</p>
+    </div>
+
+    <!-- MAIN ARTICLE -->
+    <p class="section-label">The Stone</p>
+    <div class="prose">
+      <p class="dropcap">The Monk Diamond is among the rarest jewels ever recorded — a vivid green stone over one billion years old, valued at more than ten million dollars. Found in 1880, it was purchased nine years later by a Russian nobleman as a gift for his wife, and entered the highest circles of imperial society.</p>
+    </div>
+
+    <!-- DISCOVERY CALLOUT -->
+    <div class="callout">
+      <p>Professor Bairstone and Dr Day, on a fossil-hunting expedition in Siberia, made an extraordinary discovery: the Monk Diamond, concealed inside a remote cave — bringing to a close one of history's most enduring gemological mysteries.</p>
+    </div>
+
+    <!-- TIMELINE -->
+    <p class="section-label">A Turbulent History</p>
+    <div class="timeline">
+      <div class="timeline-item">
+        <span class="timeline-year">1880</span>
+        <div class="timeline-dot"></div>
+        <p class="timeline-text">The diamond is discovered in a remote cave in Australia. The finding team describes their discovery as one for the ages.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">1889</span>
+        <div class="timeline-dot"></div>
+        <p class="timeline-text">A Russian nobleman purchases the stone as a gift for his wife, bringing it to St Petersburg where it becomes the jewel of the imperial social scene.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">1917</span>
+        <div class="timeline-dot"></div>
+        <p class="timeline-text">During the Russian Revolution, the diamond is stolen from the nobleman's palace in St Petersburg. Its whereabouts become unknown.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">1947</span>
+        <div class="timeline-dot"></div>
+        <p class="timeline-text">In a police raid in Moscow, the diamond is recovered from a gang of petty criminals. It is returned to the nobleman's surviving son.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">1950s</span>
+        <div class="timeline-dot"></div>
+        <p class="timeline-text">Believing the stone to be cursed, the nobleman's son sells it for an extraordinary sum. The House of Volkov — prominent jewel salesmen — becomes the new owner and places it on public display.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="timeline-year">Recent</span>
+        <div class="timeline-dot"></div>
+        <p class="timeline-text">Three years ago, the Bond Brothers carry out a daring theft from the House of Volkov. The diamond vanishes once more — until its dramatic recovery in Siberia.</p>
+      </div>
+    </div>
+
+    <!-- FOOTER NAV -->
+    <div class="page-footer">
+      <div>
+        <a href="https://therubbersandgiants.github.io">← The Rubbers &amp; Giants</a>
+      </div>
+      <div>
+        <a href="MORE on the diamond.html">More on the Diamond →</a>
+      </div>
+      <span class="site-credit">The Monk Diamond · Special Report</span>
+    </div>
+
+  </main>
+
 </body>
 </html>
